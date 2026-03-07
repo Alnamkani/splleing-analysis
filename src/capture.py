@@ -10,7 +10,7 @@ from pynput import keyboard
 from src.db import WordBuffer, ensure_db
 
 
-DATA_DIR = Path.home() / ".splleing-analysis"
+DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 PID_FILE = DATA_DIR / "capture.pid"
 MAX_BUFFER_LEN = 100
 

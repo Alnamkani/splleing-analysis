@@ -4,7 +4,7 @@ import time
 from pathlib import Path
 
 
-DATA_DIR = Path.home() / ".splleing-analysis"
+DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 DB_PATH = DATA_DIR / "words.db"
 
 BATCH_SIZE = 10
