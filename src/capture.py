@@ -1,8 +1,8 @@
+import atexit
 import os
 import signal
 import sys
 import threading
-import time
 from pathlib import Path
 
 from pynput import keyboard
@@ -67,8 +67,14 @@ def main() -> None:
 
     if PID_FILE.exists():
         old_pid = PID_FILE.read_text().strip()
-        print(f"PID file exists (pid={old_pid}). Already running?")
-        sys.exit(1)
+        try:
+            os.kill(int(old_pid), 0)
+            print(f"Already running (pid={old_pid}).")
+            sys.exit(1)
+        except (OSError, ValueError):
+            PID_FILE.unlink()
+
+    atexit.register(lambda: PID_FILE.unlink(missing_ok=True))
 
     PID_FILE.write_text(str(os.getpid()))
 
