@@ -1,5 +1,6 @@
 import sqlite3
 import sys
+import unicodedata
 from collections import Counter
 from difflib import get_close_matches
 from pathlib import Path
@@ -7,6 +8,10 @@ from pathlib import Path
 
 DB_PATH = Path.home() / ".splleing-analysis" / "words.db"
 WORDS_FILE = Path("/usr/share/dict/words")
+
+
+def is_arabic(word: str) -> bool:
+    return any(unicodedata.name(c, "").startswith("ARABIC") for c in word if c.isalpha())
 
 
 def load_dictionary() -> set[str]:
@@ -53,12 +58,24 @@ def analyze(date_from: str | None = None, date_to: str | None = None) -> None:
     print(f"\nTotal words captured: {len(words)}")
     print(f"Unique words: {len(freq)}")
 
-    print("\n--- Top 20 Most Frequent Words ---")
-    for word, count in freq.most_common(20):
-        print(f"  {word:30s} {count}")
+    arabic_freq = Counter({w: c for w, c in freq.items() if is_arabic(w)})
+    english_freq = Counter({w: c for w, c in freq.items() if not is_arabic(w)})
+
+    if english_freq:
+        print("\n--- Top 20 English Words ---")
+        for word, count in english_freq.most_common(20):
+            print(f"  {word:30s} {count}")
+
+    if arabic_freq:
+        print("\n--- Top 20 Arabic Words ---")
+        for word, count in arabic_freq.most_common(20):
+            print(f"  {word:30s} {count}")
 
     if dictionary:
-        misspelled = {w: c for w, c in freq.items() if w.isalpha() and len(w) > 1 and w not in dictionary}
+        misspelled = {
+            w: c for w, c in english_freq.items()
+            if w.isalpha() and len(w) > 1 and w not in dictionary
+        }
         if misspelled:
             print(f"\n--- Potential Misspellings ({len(misspelled)} found) ---")
             for word, count in sorted(misspelled.items(), key=lambda x: -x[1])[:30]:
