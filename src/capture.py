@@ -7,7 +7,7 @@ from pathlib import Path
 
 from pynput import keyboard
 
-from src.db import WordBuffer, ensure_db
+from db import WordBuffer, ensure_db
 
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"

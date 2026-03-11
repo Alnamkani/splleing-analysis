@@ -6,7 +6,7 @@ from difflib import get_close_matches
 from pathlib import Path
 
 
-DB_PATH = Path.home() / ".splleing-analysis" / "words.db"
+DB_PATH = Path(__file__).resolve().parent.parent / "data" / "words.db"
 WORDS_FILE = Path("/usr/share/dict/words")
 
 
